@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  @apply absolute inset-0 overflow-y-auto bg-black text-slate-100;
+}
