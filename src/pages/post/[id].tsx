@@ -6,8 +6,6 @@ const PostPage: NextPage = () => {
     <>
       <Head>
         <title>Post</title>
-        <meta name="Post" content="A post page" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="absolute inset-0 flex justify-center">
         <div className="w-full border-x border-slate-400 md:max-w-2xl">

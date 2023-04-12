@@ -4,4 +4,6 @@
 
 body {
   @apply absolute inset-0 overflow-y-auto bg-black text-slate-100;
+
+  overscroll-behavior: none;
 }

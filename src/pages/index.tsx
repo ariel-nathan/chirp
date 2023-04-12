@@ -1,15 +1,10 @@
 import { LoadingSpinner } from "@/components/Loading";
-import { api, type RouterOutputs } from "@/utils/api";
+import { PostView } from "@/components/PostView";
+import { api } from "@/utils/api";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 import { type NextPage } from "next";
-import Head from "next/head";
-import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-
-dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const [input, setInput] = useState("");
@@ -79,29 +74,6 @@ const CreatePostWizard = () => {
   );
 };
 
-type PostWithUser = RouterOutputs["posts"]["getAll"][number];
-
-const PostView = (props: PostWithUser) => {
-  const { post, author } = props;
-
-  return (
-    <Link href={`/post/${post.id}`}>
-      <div className="flex flex-col justify-center gap-4 border border-slate-400 p-8 hover:border-slate-800">
-        <div className="w-fit text-slate-200">
-          <Link href={`/user/${author.id}`}>
-            <div className="truncate hover:text-slate-400">{author.id}</div>
-          </Link>
-          <div className="text-sm text-slate-500">
-            {dayjs(post.createdAt).fromNow()}
-          </div>
-        </div>
-
-        <div className="text-2xl">{post.content}</div>
-      </div>
-    </Link>
-  );
-};
-
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
@@ -127,33 +99,26 @@ const Home: NextPage = () => {
   if (!userLoaded) return <div></div>;
 
   return (
-    <>
-      <Head>
-        <title>Chirp</title>
-        <meta name="Chirp" content="The Chirp homepage" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main className="absolute inset-0 flex justify-center">
-        <div className="w-full border-x border-slate-400 md:max-w-2xl">
-          <div className="flex justify-center border-b border-slate-400 p-4">
-            {!isSignedIn && (
-              <div className="flex justify-center border border-slate-400 p-2">
-                <SignInButton />
+    <main className="flex h-screen justify-center">
+      <div className="w-full md:max-w-2xl">
+        <div className="sticky top-0 flex h-20 w-full justify-center border border-slate-400 bg-black p-4">
+          {!isSignedIn && (
+            <div className="flex justify-center border border-slate-400 p-2 text-slate-400 hover:border-slate-500 hover:text-slate-500">
+              <SignInButton />
+            </div>
+          )}
+          {isSignedIn && (
+            <div className="flex w-full justify-between gap-5">
+              <CreatePostWizard />
+              <div className="flex justify-center border border-slate-400 p-2 text-slate-400 hover:border-slate-500 hover:text-slate-500">
+                <SignOutButton />
               </div>
-            )}
-            {isSignedIn && (
-              <div className="flex w-full justify-between gap-5">
-                <CreatePostWizard />
-                <div className="flex justify-center border border-slate-400 p-2">
-                  <SignOutButton />
-                </div>
-              </div>
-            )}
-          </div>
-          <Feed />
+            </div>
+          )}
         </div>
-      </main>
-    </>
+        <Feed />
+      </div>
+    </main>
   );
 };
 
