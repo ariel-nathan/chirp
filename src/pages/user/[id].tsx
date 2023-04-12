@@ -1,6 +1,10 @@
+import { LoadingSpinner } from "@/components/Loading";
+import { PostView } from "@/components/PostView";
+import { generateSSGHelper } from "@/server/helpers/ssgHelper";
 import { api } from "@/utils/api";
 import { type GetStaticProps, type NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 
 const ProfileFeed = (props: { userId: string }) => {
   const { data, isLoading } = api.posts.getPostByUserId.useQuery({
@@ -50,31 +54,19 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   );
 };
 
-import { LoadingSpinner } from "@/components/Loading";
-import { PostView } from "@/components/PostView";
-import { appRouter } from "@/server/api/root";
-import { prisma } from "@/server/db";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import Link from "next/link";
-import superjson from "superjson";
-
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: superjson, // optional - adds superjson serialization
-  });
+  const ssg = generateSSGHelper();
 
-  const slug = context.params?.id;
+  const userId = context.params?.id;
 
-  if (typeof slug !== "string") throw new Error("No slug");
+  if (typeof userId !== "string") throw new Error("No userId");
 
-  await ssg.profile.getUserByUsername.prefetch({ userId: slug });
+  await ssg.profile.getUserByUsername.prefetch({ userId });
 
   return {
     props: {
       trpcState: ssg.dehydrate(),
-      userId: slug,
+      userId,
     },
   };
 };
